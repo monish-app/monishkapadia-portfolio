@@ -113,13 +113,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   transition: opacity .5s var(--ease), filter .45s var(--ease);
 }
 .logo:hover img { opacity: .6; }
-.top__link {
-  font-size: .625rem; font-weight: 500; letter-spacing: .2em; text-transform: uppercase;
-  color: var(--fg-mute); transition: color .5s var(--ease);
-}
-.top__link:hover { color: var(--fg); }
-.back { font-size: .625rem; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: var(--fg-mute); transition: color .5s var(--ease); }
-.back:hover { color: var(--fg); }
+.top__in > .pills { margin-right: calc(-1 * .25rem); }
 
 /* ============================================================
    Hero — owns the screen, nothing else competes
@@ -404,25 +398,29 @@ figcaption { font-size: .6rem; font-weight: 500; letter-spacing: .18em; text-tra
 .foot__base img { height: 16px; width: auto; filter: invert(var(--logo-inv)); opacity: .5; }
 
 /* ============================================================
-   Floating chrome
+   Chrome — pill nav in the top bar, theme toggle floating
    ============================================================ */
 .pills {
-  position: fixed; left: 50%; bottom: 1.3rem; z-index: 800;
-  display: flex; gap: .2rem; padding: .3rem;
+  display: flex; gap: .2rem; padding: .25rem;
   background: color-mix(in srgb, var(--bg-3) 85%, transparent);
-  backdrop-filter: blur(16px) saturate(170%);
   border: 1px solid var(--line); border-radius: 999px;
-  transform: translate(-50%, 130%);
-  transition: transform 1s var(--ease) .35s;
+  opacity: 0; transform: translateY(-7px);
+  transition: opacity 1s var(--ease) .35s, transform 1s var(--ease) .35s;
 }
-.loaded .pills { transform: translate(-50%, 0); }
+.loaded .pills { opacity: 1; transform: none; }
 .pills a {
   font-size: .6rem; font-weight: 500; letter-spacing: .18em; text-transform: uppercase;
-  padding: .66em 1.15em; border-radius: 999px; color: var(--fg-2); white-space: nowrap;
+  padding: .6em 1.05em; border-radius: 999px; color: var(--fg-2); white-space: nowrap;
   transition: background-color .5s var(--ease), color .5s var(--ease);
 }
 .pills a:hover { color: var(--fg); }
 .pills a[aria-current="page"] { background: var(--fg); color: var(--bg); }
+@media (max-width: 560px) {
+  .pills a { font-size: .55rem; padding: .58em .78em; letter-spacing: .14em; }
+}
+@media (max-width: 420px) {
+  .pills a:first-child { display: none; } /* logo already goes home */
+}
 
 .themetoggle {
   position: fixed; right: 1.3rem; bottom: 1.3rem; z-index: 800;
@@ -455,6 +453,5 @@ figcaption { font-size: .6rem; font-weight: 500; letter-spacing: .18em; text-tra
   .js .anim .b-char { opacity: 1; filter: none; transform: none; }
   .bstrip__track { animation: none; }
   .veil { display: none; }
-  .pills, .themetoggle { transform: translate(-50%, 0); }
-  .themetoggle { transform: none; }
+  .pills, .themetoggle { opacity: 1; transform: none; }
 }

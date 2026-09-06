@@ -126,26 +126,24 @@ function awardSummary(depth, list) {
     .join("")}</ul>`;
 }
 
-/* ---------- top bar ---------- */
-function top(depth, back) {
+/* ---------- top bar: logo + pill nav ---------- */
+function top(depth, current) {
   const u = up(depth);
+  const on = (k) => (current === k ? ' aria-current="page"' : "");
   return `<header class="top"><div class="wrap top__in">
   <a class="logo" href="${u}index.html" aria-label="Monish Kapadia, home"><img src="${u}assets/logo-mk.png" alt="Monish Kapadia" width="720" height="410"></a>
-  ${back ? `<a class="back" href="${u}index.html">&larr; Index</a>` : `<a class="top__link" href="mailto:${site.email}">${site.email}</a>`}
+  <nav class="pills" aria-label="Sections">
+    <a href="${u}index.html"${on("home")}>Home</a>
+    <a href="${u}index.html#work"${on("work")}>Work</a>
+    <a href="${u}about/index.html"${on("about")}>About</a>
+    <a href="mailto:${site.email}">Contact</a>
+  </nav>
 </div></header>`;
 }
 
-/* ---------- pill nav + theme toggle ---------- */
+/* ---------- theme toggle ---------- */
 function chrome(depth, current) {
-  const u = up(depth);
-  const on = (k) => (current === k ? ' aria-current="page"' : "");
-  return `<nav class="pills" aria-label="Sections">
-  <a href="${u}index.html"${on("home")}>Home</a>
-  <a href="${u}index.html#work"${on("work")}>Work</a>
-  <a href="${u}about/index.html"${on("about")}>About</a>
-  <a href="mailto:${site.email}">Contact</a>
-</nav>
-<button class="themetoggle" type="button" data-theme-toggle aria-label="Switch colour theme">
+  return `<button class="themetoggle" type="button" data-theme-toggle aria-label="Switch colour theme">
   <i aria-hidden="true">&#9686;</i><span data-theme-label>Dark</span>
 </button>`;
 }
@@ -240,7 +238,7 @@ function home() {
     image: "/assets/media/loops/hinge.jpg",
     depth: d
   })}
-${top(d, false)}
+${top(d, "home")}
 <main id="main">
 <section class="wrap hero">
   <p class="hero__pre s">A curious kid who never stopped asking</p>
@@ -293,7 +291,7 @@ function project(p, i) {
     image: p.tile.poster,
     depth: d
   })}
-${top(d, true)}
+${top(d, "work")}
 <main id="main">
 <section class="wrap case-head">
   <div class="case-head__eyebrow">
@@ -339,7 +337,7 @@ function aboutPage() {
     image: "/assets/media/loops/hinge.jpg",
     depth: d
   })}
-${top(d, true)}
+${top(d, "about")}
 <main id="main">
 <section class="wrap case-head">
   <p class="label" style="margin-bottom:1.2rem">About</p>
@@ -381,7 +379,7 @@ function notFound() {
     image: "/assets/media/loops/hinge.jpg",
     depth: d
   })}
-${top(d, true)}
+${top(d, "home")}
 <main id="main"><section class="wrap hero">
   <p class="label hero__kicker">Error 404</p>
   <h1 class="d hero__q" data-anim style="max-width:14ch">What if this page never <span class="s">existed</span>?</h1>
