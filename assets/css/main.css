@@ -20,6 +20,7 @@
 
   --pad:  clamp(1.25rem, 4.5vw, 5rem);
   --maxw: 1600px;
+  --topbar: clamp(84px, 11.5vh, 124px);
 
   /* One ease, heavily decelerated. Everything moves slowly. */
   --ease: cubic-bezier(.22, 1, .36, 1);
@@ -98,14 +99,24 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 
 
-/* ---------- Top bar: logo + one link ---------- */
+/* ---------- Top bar: logo + pill nav. Open at rest, a bar once scrolled ---------- */
 .top {
   position: sticky; top: 0; z-index: 700;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: background-color .6s var(--ease), border-color .6s var(--ease), backdrop-filter .6s var(--ease);
+}
+:root.scrolled .top {
   background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: blur(14px) saturate(160%);
-  border-bottom: 1px solid var(--line);
+  border-bottom-color: var(--line);
 }
-.top__in { display: flex; align-items: center; justify-content: space-between; gap: 1rem; height: 62px; }
+.top__in {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  height: var(--topbar);
+  transition: height .6s var(--ease);
+}
+:root.scrolled .top__in { height: 68px; }
 .logo { display: block; }
 .logo img {
   height: 22px; width: auto;
@@ -120,7 +131,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
    ============================================================ */
 .hero {
   position: relative;
-  min-height: calc(100svh - 62px);
+  min-height: calc(100svh - var(--topbar));
   display: flex; flex-direction: column; justify-content: center;
   padding-block: clamp(4rem, 12vh, 9rem) clamp(6rem, 14vh, 9rem);
 }

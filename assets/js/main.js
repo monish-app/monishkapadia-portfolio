@@ -12,6 +12,16 @@
   else window.addEventListener("load", lift);
   setTimeout(lift, 1800); // never leave the veil up if something stalls
 
+  /* ---- 1b. Top bar condenses once you leave the top ---- */
+  var onAt = 48, offAt = 12, barOn = false;
+  function bar() {
+    var y = window.pageYOffset || root.scrollTop || 0;
+    if (!barOn && y > onAt) { barOn = true; root.classList.add("scrolled"); }
+    else if (barOn && y < offAt) { barOn = false; root.classList.remove("scrolled"); }
+  }
+  bar();
+  window.addEventListener("scroll", bar, { passive: true });
+
   /* ---- 2. Theme (dark is the default, choice persists) ---- */
   var toggle = document.querySelector("[data-theme-toggle]");
   function currentTheme() { return root.getAttribute("data-theme") === "light" ? "light" : "dark"; }
