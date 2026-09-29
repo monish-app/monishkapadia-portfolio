@@ -133,7 +133,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   position: relative;
   min-height: calc(100svh - var(--topbar));
   display: flex; flex-direction: column; justify-content: center;
-  padding-block: clamp(4rem, 12vh, 9rem) clamp(6rem, 14vh, 9rem);
+  /* Deliberately lopsided: the heavier bottom padding lifts the block
+     ~5vh above true centre, so the weighted display type optically centres. */
+  padding-block: clamp(2.5rem, 7vh, 6rem) clamp(7rem, 17vh, 12rem);
 }
 .hero__pre {
   font-size: min(1.75rem, 4.3vw); line-height: 1.2; white-space: nowrap;
