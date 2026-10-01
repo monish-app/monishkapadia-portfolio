@@ -30,10 +30,14 @@ const write = (rel, html) => {
 /* depth 0 = site root, 1 = /about/, 2 = /work/<slug>/ */
 const up = (depth) => "../".repeat(depth);
 
+/* Stills may be .jpg, .png or .webp. Resolve whichever is on disk so an
+   asset can be swapped without touching content.mjs. */
+const STILL_EXTS = [".jpg", ".jpeg", ".png", ".webp"];
 function media(depth, rel, ext) {
-  const p = path.join(MEDIA, rel + ext);
-  if (!fs.existsSync(p)) missing.push(rel + ext);
-  return `${up(depth)}assets/media/${rel}${ext}`;
+  const tries = ext === ".mp4" ? [ext] : [ext, ...STILL_EXTS.filter((e) => e !== ext)];
+  const hit = tries.find((e) => fs.existsSync(path.join(MEDIA, rel + e)));
+  if (!hit) missing.push(rel + ext);
+  return `${up(depth)}assets/media/${rel}${hit || ext}`;
 }
 const asset = (depth, abs) => up(depth) + String(abs).replace(/^\//, "");
 
@@ -175,15 +179,35 @@ ${chrome(depth, current)}
 }
 
 /* ---------- media renderers ---------- */
+/* Collage placement: col / row / span (12-col) and drop (stagger steps) */
+function place(item) {
+  const v = [
+    item.col != null ? `--col:${item.col}` : "",
+    item.row != null ? `--row:${item.row}` : "",
+    item.span != null ? `--span:${item.span}` : "",
+    item.drop != null ? `--drop:${item.drop}` : "",
+    item.w != null ? `--w:${item.w}` : ""
+  ].filter(Boolean);
+  return v.length ? ` style="${v.join(";")}"` : "";
+}
+
 function renderOne(depth) {
   return function render(item) {
     if (item.t === "grid") {
       return `<div class="media-grid mg-${item.cols}">${item.items.map(render).join("\n")}</div>`;
     }
+    if (item.t === "row") {
+      const k = `media-row${item.plate ? " media-row--plate" : ""}${item.spread ? " media-row--spread" : ""}`;
+      return `<div class="${k}">${item.items.map(render).join("\n")}</div>`;
+    }
+    if (item.t === "collage") {
+      return `<div class="collage">${item.items.map(render).join("\n")}</div>`;
+    }
     const poster = media(depth, item.src, ".jpg");
+    const st = place(item);
     if (item.t === "film") {
       const src = media(depth, item.src, ".mp4");
-      return `<figure class="stage film">
+      return `<figure class="stage film"${st}>
   <img class="film__poster" src="${poster}" alt="${esc(item.cap || "")}" loading="lazy" decoding="async">
   <video class="film__vid" preload="none" data-src="${src}" playsinline></video>
   <button class="film__btn" type="button" aria-label="Play ${esc(item.cap)}"><span>&#9654; Play${item.cap ? " &middot; " + esc(item.cap) : ""}</span></button>
@@ -191,12 +215,18 @@ function renderOne(depth) {
     }
     if (item.t === "loop") {
       const src = media(depth, item.src, ".mp4");
-      return `<figure>
-  <div class="stage"><video data-loop src="${src}" poster="${poster}" muted loop playsinline preload="metadata"></video></div>
+      /* auto: runs whenever it is on screen, not only on hover.
+         sound: a mute toggle that surfaces on hover. */
+      const flags = `${item.auto ? " data-auto" : ""}${item.sound ? " data-sound" : ""}`;
+      const btn = item.sound
+        ? `<button class="snd" type="button" data-snd aria-pressed="false" aria-label="Turn sound on"><i aria-hidden="true">&#9834;</i><span>Sound on</span></button>`
+        : "";
+      return `<figure class="fig"${st}>
+  <div class="stage${item.sound ? " stage--snd" : ""}"><video data-loop${flags} src="${src}" poster="${poster}" muted loop playsinline preload="metadata"></video>${btn}</div>
   ${item.cap ? `<figcaption>${esc(item.cap)}</figcaption>` : ""}
 </figure>`;
     }
-    return `<figure>
+    return `<figure class="fig"${st}>
   <div class="stage"><img src="${poster}" alt="${esc(item.cap || "")}" loading="lazy" decoding="async"></div>
   ${item.cap ? `<figcaption>${esc(item.cap)}</figcaption>` : ""}
 </figure>`;
@@ -278,7 +308,7 @@ function project(p, i) {
   const sections = p.sections
     .map(
       (s) => `<section class="block wrap rise">
-  <div class="block__head"><h2>${esc(s.q)}</h2></div>
+  ${s.q ? `<div class="block__head"><h2>${esc(s.q)}</h2></div>` : ""}
   ${s.media.map(render).join("\n  ")}
 </section>`
     )
@@ -301,7 +331,7 @@ ${top(d, "work")}
   <p class="case-head__q">${esc(p.question)}</p>
 </section>
 
-<div class="wrap">
+<div class="wrap case-body">
   <div class="case-lede">${p.answer.map((a) => `<p>${a}</p>`).join("\n")}</div>
   <dl class="credits">
     <div class="credits__row"><dt class="label">Role</dt><dd>${esc(p.role)}</dd></div>

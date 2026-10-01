@@ -306,8 +306,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
    Case study
    ============================================================ */
 .case-head {
-  min-height: 62svh; display: flex; flex-direction: column; justify-content: flex-end;
-  padding-block: clamp(3rem, 9vh, 6rem) clamp(2rem, 5vh, 3.4rem);
+  /* No min-height: the old 62svh box left a void above the eyebrow and pushed
+     the whole page down. The title block is now just its own content. */
+  padding-block: clamp(2rem, 6vh, 4.5rem) clamp(2rem, 5vh, 3.4rem);
 }
 .case-head__eyebrow { display: flex; flex-wrap: wrap; gap: .45rem 1.5rem; margin-bottom: clamp(1.4rem,3.5vh,2.2rem); }
 .case-head__name { font-size: clamp(2.5rem, 8.4vw, 7.4rem); }
@@ -317,19 +318,79 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   color: var(--fg-2); max-width: 24ch; margin-top: clamp(.9rem, 2.2vh, 1.5rem);
 }
 
-.case-lede { padding-block: clamp(3rem,8vh,6rem) clamp(2rem,5vh,3.2rem); max-width: 60ch; }
+/* Lede left, credits in a column to its right */
+.case-body {
+  display: grid; align-items: start;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+  gap: clamp(2.5rem, 6vw, 6rem);
+  padding-block: clamp(3rem,8vh,6rem) clamp(3rem,8vh,5rem);
+}
+.case-lede { max-width: 60ch; }
 .case-lede p { font-size: clamp(1rem, 1.3vw, 1.2rem); line-height: 1.68; color: var(--fg-2); }
 .case-lede p + p { margin-top: 1.2em; }
 
-.credits {
-  display: grid; grid-template-columns: repeat(3, minmax(0,1fr));
-  gap: clamp(1.6rem, 4vw, 4rem);
-  border-top: 1px solid var(--line); padding-block: clamp(2rem,5vh,3.2rem) clamp(3rem,8vh,5rem);
+.credits { display: grid; gap: clamp(1.5rem, 3vh, 2.2rem); }
+.credits__row { display: grid; gap: .7rem; align-content: start; }
+.credits__row + .credits__row { border-top: 1px solid var(--line); padding-top: clamp(1.5rem, 3vh, 2.2rem); }
+
+/* Stacked: credits drop under the lede and spread back into a row */
+@media (max-width: 900px) {
+  .case-body { grid-template-columns: 1fr; gap: clamp(2rem, 5vh, 3.2rem); }
+  .credits {
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: clamp(1.6rem, 4vw, 4rem);
+    border-top: 1px solid var(--line); padding-top: clamp(2rem,5vh,3.2rem);
+  }
+  .credits__row + .credits__row { border-top: 0; padding-top: 0; }
 }
 @media (max-width: 780px) { .credits { grid-template-columns: 1fr; gap: 1.8rem; } }
-.credits__row { display: grid; gap: .7rem; align-content: start; }
 .credits__row dd { font-size: .95rem; line-height: 1.55; color: var(--fg); }
 .credits__row dd em { font-style: normal; color: var(--fg-2); }
+/* Media sized by intent: --w is a share of the content measure, so a phone
+   mockup renders at phone scale instead of billboard scale. */
+.block figure { width: var(--w, 100%); }
+/* Sound toggle: sits at the foot of a loop, surfaces on hover */
+.stage--snd { position: relative; }
+.snd {
+  position: absolute; left: 50%; bottom: .7rem; transform: translate(-50%, .5rem);
+  display: inline-flex; align-items: center; gap: .45rem;
+  font-size: .55rem; font-weight: 500; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--fg); padding: .6em .95em; border-radius: 999px;
+  background: color-mix(in srgb, #050505 68%, transparent);
+  backdrop-filter: blur(10px) saturate(160%);
+  border: 1px solid color-mix(in srgb, #FFFFFF 22%, transparent);
+  opacity: 0; pointer-events: none; white-space: nowrap;
+  transition: opacity .45s var(--ease), transform .45s var(--ease);
+}
+.snd i { font-style: normal; }
+.stage--snd:hover .snd, .snd:focus-visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.snd[aria-pressed="true"] { background: var(--fg); color: #050505; border-color: var(--fg); opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+@media (hover: none) { .snd { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; } }
+
+.media-row { display: flex; flex-wrap: wrap; gap: clamp(.9rem, 2vw, 1.6rem); align-items: flex-start; }
+
+/* A plate: these mockups already sit on white, so drop the panel and the
+   hairline and let them share one continuous field, devices centred. */
+.media-row--plate {
+  background: #FFFFFF; align-items: center;
+  padding: clamp(1.2rem, 3vw, 2.6rem);
+  gap: clamp(1rem, 2.4vw, 2rem);
+}
+.media-row--spread { justify-content: space-between; }
+/* Two plates in a row are two compositions, not one field */
+.media-row--plate + .media-row--plate { margin-top: clamp(1.6rem, 3.5vw, 3rem); }
+.media-row--plate .stage { background: transparent; border: 0; }
+.media-row--plate figcaption { color: #6B6B73; }
+@media (max-width: 780px) {
+  .media-row--plate { padding: 1rem; gap: 1rem; }
+  .media-row--plate > figure { --w-sm: auto; width: auto; flex: 1 1 40%; }
+}
+@media (max-width: 780px) {
+  .block figure { width: var(--w-sm, var(--w, 100%)); }
+  .media-row > figure { --w-sm: 46%; }
+  .block > .media > figure { --w-sm: 70%; }
+}
+
 .awards { display: grid; gap: .5rem; }
 .awards li { font-size: .875rem; color: var(--fg-2); display: grid; grid-template-columns: 5.6rem 1fr; gap: .7rem; }
 .awards li b { font-size: .6rem; font-weight: 500; letter-spacing: .16em; color: var(--fg); text-transform: uppercase; padding-top: .35em; }
@@ -341,13 +402,32 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .stage { background: var(--stage); overflow: hidden; position: relative; border: 1px solid var(--line-soft); }
 .stage video, .stage img { width: 100%; height: auto; display: block; }
 figure { margin: 0; }
-figure + figure, .media-grid + .media-grid, figure + .media-grid, .media-grid + figure { margin-top: clamp(.9rem, 2vw, 1.6rem); }
+figure + figure, .media-grid + .media-grid, figure + .media-grid, .media-grid + figure,
+.collage + figure, figure + .collage, .collage + .media-grid, .media-grid + .collage, .collage + .collage,
+figure + .media-row, .media-row + figure, .media-row + .media-row,
+.media-grid + .media-row, .media-row + .media-grid, .collage + .media-row, .media-row + .collage { margin-top: clamp(.9rem, 2vw, 1.6rem); }
 figcaption { font-size: .6rem; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--fg-mute); padding-top: .7rem; }
 
 .media-grid { display: grid; gap: clamp(.9rem, 2vw, 1.6rem); }
 .mg-2 { grid-template-columns: repeat(2, 1fr); }
 .mg-3 { grid-template-columns: repeat(3, 1fr); }
 @media (max-width: 780px) { .mg-2, .mg-3 { grid-template-columns: 1fr; } }
+
+/* Collage — loose, staggered clusters. Content places each piece on a
+   12-column field with --col / --row / --span, and --drop staggers it down. */
+.collage {
+  display: grid; grid-template-columns: repeat(12, 1fr);
+  gap: clamp(.9rem, 2vw, 1.6rem); align-items: start;
+}
+.collage > * {
+  grid-column: var(--col, auto) / span var(--span, 6);
+  grid-row: var(--row, auto);
+  margin-top: calc(var(--drop, 0) * clamp(.5rem, 1.3vw, 1.3rem));
+}
+@media (max-width: 860px) {
+  .collage { grid-template-columns: 1fr; }
+  .collage > * { grid-column: 1 / -1; grid-row: auto; margin-top: 0; }
+}
 
 /* Click-to-play film */
 .film { position: relative; }

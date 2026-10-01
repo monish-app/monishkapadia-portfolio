@@ -82,6 +82,8 @@ const film = (src, cap, opt = {}) => ({ t: "film", src, cap, ...opt });
 const loop = (src, cap, opt = {}) => ({ t: "loop", src, cap, ...opt });
 const img  = (src, cap, opt = {}) => ({ t: "img",  src, cap, ...opt });
 const grid = (cols, items) => ({ t: "grid", cols, items });
+const collage = (items) => ({ t: "collage", items });
+const row = (items, opt = {}) => ({ t: "row", items, ...opt });
 
 export const projects = [
   /* ============================== HINGE ============================== */
@@ -109,53 +111,53 @@ export const projects = [
       { badge: "AA", text: "Applied Arts Award" }
     ],
     sections: [
-      { q: "So what actually happened?", media: [film("hinge/02-finalcampaignvideo", "Campaign film")] },
-      { q: "Where did the texts go?", media: [film("hinge/03-micrositemockup", "The disappearing microsite")] },
       {
-        q: "How do you make a whole city nervous?",
+        q: "First, how do you make a whole city nervous?",
         media: [
-          loop("hinge/13outdoor-countdown-1", "Outdoor countdown, live to the second"),
-          film("hinge/04-just-count-down", "The countdown, in full")
-        ]
-      },
-      {
-        q: "What did it look like outside?",
-        media: [
+          film("hinge/02-finalcampaignvideo", "Campaign film"),
           grid(2, [
-            img("hinge/06ooh-mockup-1", "OOH"),
-            img("hinge/12ooh-mockup-7", "OOH"),
-            img("hinge/09ooh-mockup-4", "OOH"),
-            img("hinge/10ooh-mockup-5", "OOH"),
-            img("hinge/11ooh-mockup-6", "OOH"),
-            img("hinge/14ooh-confession-booth", "Confession booth")
-          ])
-        ]
-      },
-      {
-        q: "And in your hand?",
-        media: [
-          grid(3, [
-            loop("hinge/05-in-app-countdown-mp4", "In-app countdown"),
-            img("hinge/15phone-message", "Lock screen"),
-            img("hinge/18text-notifications", "Notifications")
-          ])
-        ]
-      },
-      {
-        q: "Then what did the internet do with it?",
-        media: [
-          grid(2, [
-            img("hinge/17reddit-post", "Reddit"),
-            img("hinge/16press-mockups", "Press")
+            loop("hinge/13outdoor-countdown-1", "Outdoor countdown, live to the second", { auto: true }),
+            img("hinge/09ooh-mockup-4", "OOH")
           ]),
           grid(2, [
-            loop("hinge/19-ugc-1-mocked", "UGC"),
-            loop("hinge/20-ugc-2-mocked", "UGC")
+            img("hinge/06ooh-mockup-1", "OOH"),
+            img("hinge/10ooh-mockup-5", "OOH")
+          ]),
+          grid(2, [
+            img("hinge/11ooh-mockup-6", "OOH"),
+            img("hinge/12ooh-mockup-7", "OOH")
           ])
         ]
       },
-      { q: "How does it end?", media: [loop("hinge/01-hinge-logo-animation", "Logo animation"), img("hinge/end-card", "End card")] }
-    ]
+      {
+        q: "Then the 24 hours start. What happens in your hand?",
+        media: [
+          /* Two white plates. The widths look arbitrary but are derived from
+             where the device actually sits inside each mockup, so every phone
+             across both plates renders at the same size. */
+          row([
+            loop("hinge/03-micrositemockup", "The disappearing microsite", { w: "48%", auto: true }),
+            loop("hinge/05-in-app-countdown-mp4", "In-app countdown", { w: "29.8%", auto: true }),
+            img("hinge/15phone-message", "Text message received from ex", { w: "11.8%" })
+          ], { plate: true, spread: true }),
+          row([
+            img("hinge/18text-notifications", "Notifications", { w: "45.4%" }),
+            img("hinge/16press-mockups", "Press", { w: "50.6%" })
+          ], { plate: true })
+        ]
+      },
+      {
+        q: "And when it is over, what is left?",
+        media: [
+          img("hinge/17reddit-post", "Reddit"),
+          row([
+            loop("hinge/19-ugc-1-mocked", "UGC", { w: "19%", auto: true, sound: true }),
+            loop("hinge/20-ugc-2-mocked", "UGC", { w: "19%", auto: true, sound: true })
+          ])
+        ]
+      },
+      { q: "", media: [img("hinge/end-card", "End card")] }
+    ],
   },
 
   /* ============================ VASELINE ============================ */

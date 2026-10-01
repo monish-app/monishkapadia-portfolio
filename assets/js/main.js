@@ -128,9 +128,25 @@
     }
   }
 
-  /* ---- 5. Grid tiles: play on hover (desktop) / in view (touch) ---- */
-  var tiles = [].slice.call(document.querySelectorAll("[data-loop]"));
+  /* ---- 5. Loops ----
+     [data-auto] runs whenever it is on screen. Everything else keeps the
+     old behaviour: play on hover (desktop) or in view (touch). ---- */
+  var loops = [].slice.call(document.querySelectorAll("[data-loop]"));
+  var autos = loops.filter(function (v) { return v.hasAttribute("data-auto"); });
+  var tiles = loops.filter(function (v) { return !v.hasAttribute("data-auto"); });
   var canHover = window.matchMedia("(hover: hover)").matches;
+
+  if (!reduced && "IntersectionObserver" in window) {
+    var ao2 = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) safePlay(en.target);
+        else { en.target.pause(); if (!en.target.muted) muteVideo(en.target); }
+      });
+    }, { threshold: 0.2 });
+    autos.forEach(function (v) { ao2.observe(v); });
+  } else {
+    autos.forEach(function (v) { v.setAttribute("controls", ""); });
+  }
 
   if (tiles.length && !reduced) {
     if (canHover) {
@@ -148,6 +164,38 @@
       tiles.forEach(function (v) { io.observe(v); });
     }
   }
+
+  /* ---- 5b. Sound toggle on a hovered loop. Only one can be audible. ---- */
+  function paintSnd(v) {
+    var btn = v.parentElement.querySelector("[data-snd]");
+    if (!btn) return;
+    var on = !v.muted;
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+    btn.setAttribute("aria-label", on ? "Turn sound off" : "Turn sound on");
+    var lbl = btn.querySelector("span");
+    if (lbl) lbl.textContent = on ? "Sound off" : "Sound on";
+  }
+  function muteVideo(v) { v.muted = true; paintSnd(v); }
+
+  [].slice.call(document.querySelectorAll("[data-snd]")).forEach(function (btn) {
+    var v = btn.parentElement.querySelector("video");
+    if (!v) return;
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (v.muted) {
+        [].slice.call(document.querySelectorAll("[data-sound]")).forEach(function (o) {
+          if (o !== v && !o.muted) muteVideo(o);
+        });
+        v.muted = false;
+        v.volume = 1;
+        safePlay(v);
+      } else {
+        v.muted = true;
+      }
+      paintSnd(v);
+    });
+  });
 
   /* ---- 6. Click-to-play films (keeps heavy video off first paint) ---- */
   [].slice.call(document.querySelectorAll(".film")).forEach(function (film) {
